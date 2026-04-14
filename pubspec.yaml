@@ -1,0 +1,44 @@
+name: e_commerce
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  persistent_bottom_nav_bar_v2: ^6.3.2
+  flutter_carousel_widget: ^3.1.0
+  cached_network_image: ^3.4.1
+  flutter_bloc: ^9.1.1
+
+  flutter_native_splash: ^2.4.7
+  firebase_core: ^4.6.0
+  firebase_auth: ^6.3.0
+  google_sign_in: ^7.2.0
+  cloud_firestore: ^6.2.0
+  firebase_messaging: ^16.2.0
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  copy_with_extension_gen: ^14.0.0
+
+flutter_native_splash:
+  color: "#673AB7"
+  image: assets/images/kashkoul1y.png
+  android_12:
+    color: "#673AB7"
+    image: assets/images/kashkoul1y.png
+  fullscreen: true
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/kashkoul1y.png
