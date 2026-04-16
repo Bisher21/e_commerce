@@ -23,7 +23,7 @@ class PaymentMethodBottomSheet extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // ── Drag Handle ────────────────────────────────────────────
+
           Center(
             child: Container(
               width: 36,
@@ -189,7 +189,7 @@ class PaymentMethodBottomSheet extends StatelessWidget {
                                         ),
                                       ),
                                       if (isSelected)
-                                        Icon(
+                                        const Icon(
                                           Icons.check_circle_rounded,
                                           color: AppColors.primary,
                                           size: 20,

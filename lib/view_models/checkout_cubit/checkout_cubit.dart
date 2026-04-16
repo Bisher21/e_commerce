@@ -20,9 +20,10 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   Future<void> getCheckoutData() async {
     emit(CheckoutLoading());
     try {
-      final cartItems = await cartServices.fetchCartItems(
-        authServices.currentUser()!.uid,
-      );
+      final String uid = authServices.currentUser()!.uid;
+
+      // 1. Fetch Cart Items
+      final cartItems = await cartServices.fetchCartItems(uid);
       final subtotal = cartItems.fold<double>(
         0,
         (sum, item) => sum + (item.product.price * item.quantity),
@@ -32,19 +33,33 @@ class CheckoutCubit extends Cubit<CheckoutState> {
         (sum, item) => sum + item.quantity,
       );
 
-      final cards = await checkoutServices.fetchPaymentCards(
-        authServices.currentUser()!.uid,
-        true,
-      );
-      final PaymentCardModel? card = cards.isNotEmpty ? cards.first : null;
 
-      final addresses = await locationServices.fetchLocations(
-        authServices.currentUser()!.uid,
-        true,
-      );
-      final AddressModel? chosenAddress = addresses.isNotEmpty
-          ? addresses.first
-          : null;
+      final selectedCards = await checkoutServices.fetchPaymentCards(uid, true);
+      PaymentCardModel? card;
+      
+      if (selectedCards.isNotEmpty) {
+        card = selectedCards.first;
+      } else {
+
+        final allCards = await checkoutServices.fetchPaymentCards(uid, false);
+        if (allCards.isNotEmpty) {
+          card = allCards.first;
+        }
+      }
+
+
+      final selectedAddresses = await locationServices.fetchLocations(uid, true);
+      AddressModel? chosenAddress;
+
+      if (selectedAddresses.isNotEmpty) {
+        chosenAddress = selectedAddresses.first;
+      } else {
+
+        final allAddresses = await locationServices.fetchLocations(uid, false);
+        if (allAddresses.isNotEmpty) {
+          chosenAddress = allAddresses.first;
+        }
+      }
 
       emit(
         CheckoutLoaded(
