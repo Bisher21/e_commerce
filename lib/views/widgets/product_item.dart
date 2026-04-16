@@ -12,97 +12,156 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homeCubit = BlocProvider.of<HomeCubit>(context);
-    return Column(
-      children: [
-        Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                height: 135,
-                width: double.infinity,
-                color: AppColors.grey2, // Light grey background
-                child: CachedNetworkImage(
-                  imageUrl: productItem.imageUrl,
-                  fit: BoxFit.contain,
-                  placeholder: (context, url) =>
-                      const CircularProgressIndicator.adaptive(),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  height: 140,
+                  width: double.infinity,
+                  color: AppColors.grey2,
+                  child: CachedNetworkImage(
+                    imageUrl: productItem.imageUrl,
+                    fit: BoxFit.contain,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    ),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
                 ),
               ),
-            ),
-            Positioned(
-              right: 8,
-              top: 8,
-              child: DecoratedBox(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white38,
-                ),
-                child: BlocBuilder<HomeCubit, HomeState>(
-                  bloc: homeCubit,
-                  buildWhen: (previous, current) =>
-                      (current is SetFavoriteDone &&
-                          current.productId == productItem.id) ||
-                      (current is SetFavoriteError &&
-                          current.productId == productItem.id) ||
-                      (current is SetFavoriteLoading &&
-                          current.productId == productItem.id),
-                  builder: (context, state) {
-                    if (state is SetFavoriteLoading) {
-                      return const CircularProgressIndicator.adaptive();
-                    } else if (state is SetFavoriteDone) {
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Container(
+                  height: 32,
+                  width: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.08),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: BlocBuilder<HomeCubit, HomeState>(
+                    bloc: homeCubit,
+                    buildWhen: (previous, current) =>
+                        (current is SetFavoriteDone &&
+                            current.productId == productItem.id) ||
+                        (current is SetFavoriteError &&
+                            current.productId == productItem.id) ||
+                        (current is SetFavoriteLoading &&
+                            current.productId == productItem.id),
+                    builder: (context, state) {
+                      if (state is SetFavoriteLoading) {
+                        return const Padding(
+                          padding: EdgeInsets.all(7),
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        );
+                      } else if (state is SetFavoriteDone) {
+                        return InkWell(
+                          onTap: () => homeCubit.setFavorite(productItem),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Center(
+                            child: Icon(
+                              state.isFavorite
+                                  ? Icons.favorite_rounded
+                                  : Icons.favorite_border_rounded,
+                              color: state.isFavorite
+                                  ? AppColors.primary
+                                  : Colors.grey.shade400,
+                              size: 18,
+                            ),
+                          ),
+                        );
+                      }
                       return InkWell(
-                        onTap: () {
-                          homeCubit.setFavorite(productItem);
-                        },
-                        child: state.isFavorite
-                            ? const Icon(
-                                Icons.favorite,
-                                color: AppColors.primary,
-                              )
-                            : const Icon(Icons.favorite_border),
+                        onTap: () => homeCubit.setFavorite(productItem),
+                        borderRadius: BorderRadius.circular(16),
+                        child: Center(
+                          child: Icon(
+                            productItem.isFavorite
+                                ? Icons.favorite_rounded
+                                : Icons.favorite_border_rounded,
+                            color: productItem.isFavorite
+                                ? AppColors.primary
+                                : Colors.grey.shade400,
+                            size: 18,
+                          ),
+                        ),
                       );
-                    }
-                    return InkWell(
-                      onTap: () {
-                        homeCubit.setFavorite(productItem);
-                      },
-                      child: productItem.isFavorite
-                          ? const Icon(Icons.favorite, color: AppColors.primary)
-                          : const Icon(Icons.favorite_border),
-                    );
-                  },
+                    },
+                  ),
                 ),
               ),
+            ],
+          ),
+
+
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    productItem.name,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                      letterSpacing: -0.1,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    productItem.category,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    '\$${productItem.price}',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-        const SizedBox(height: 16),
-
-        Text(
-          productItem.name,
-          style: Theme.of(context).textTheme.titleSmall,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        Text(
-          productItem.category,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium!.copyWith(color: AppColors.primary),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-
-        Text(
-          '\$${productItem.price}',
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 }

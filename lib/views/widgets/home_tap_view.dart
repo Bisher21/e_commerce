@@ -23,62 +23,113 @@ class HomeTapView extends StatelessWidget {
           return const Center(child: CircularProgressIndicator.adaptive());
         } else if (state is HomeLoaded) {
           return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                FlutterCarousel.builder(
-                  options: FlutterCarouselOptions(
-                    autoPlay: true,
-                    height: 200.0,
-                    showIndicator: true,
-                    slideIndicator: CircularWaveSlideIndicator(),
-                  ),
-                  itemCount: state.carouselItems.length,
-                  itemBuilder:
-                      (
-                        BuildContext context,
-                        int itemIndex,
-                        int pageViewIndex,
-                      ) => Padding(
-                        padding: const EdgeInsetsDirectional.only(end: 12.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(24.0),
-                          child: CachedNetworkImage(
-                            imageUrl: state.carouselItems[itemIndex].imgUrl,
-                            fit: BoxFit.fill,
-                            placeholder: (context, url) =>
-                                const CircularProgressIndicator.adaptive(),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
+
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: FlutterCarousel.builder(
+                    options: FlutterCarouselOptions(
+                      autoPlay: true,
+                      height: 190.0,
+                      showIndicator: true,
+                      slideIndicator: CircularWaveSlideIndicator(),
+                      viewportFraction: 1.0,
+                    ),
+                    itemCount: state.carouselItems.length,
+                    itemBuilder: (
+                      BuildContext context,
+                      int itemIndex,
+                      int pageViewIndex,
+                    ) => Padding(
+                      padding: const EdgeInsetsDirectional.only(end: 0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20.0),
+                        child: CachedNetworkImage(
+                          imageUrl: state.carouselItems[itemIndex].imgUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey.shade200,
+                            child: const Center(
+                              child: CircularProgressIndicator.adaptive(),
+                            ),
                           ),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
                         ),
                       ),
+                    ),
+                  ),
                 ),
+
                 const SizedBox(height: 24),
+
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      "New Arrivals",
-                      style: Theme.of(context).textTheme.titleMedium,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "New Arrivals",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black87,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        Text(
+                          "${state.products.length} products",
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: Colors.grey),
+                        ),
+                      ],
                     ),
-                    Text(
-                      "See All",
-                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                        color: Theme.of(context).primaryColor,
+                    TextButton(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        backgroundColor: Colors.deepPurple.withValues(
+                          alpha: 0.08,
+                        ),
+                      ),
+                      child: Text(
+                        "See All",
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
+
+
                 GridView.builder(
                   itemCount: state.products.length,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 10,
-                    mainAxisExtent: 210,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 12,
+                    mainAxisExtent: 220,
                   ),
                   itemBuilder: (context, index) {
                     return InkWell(
@@ -87,10 +138,12 @@ class HomeTapView extends StatelessWidget {
                             AppRoutes.productDetailsRoute,
                             arguments: state.products[index].id,
                           ),
+                      borderRadius: BorderRadius.circular(20),
                       child: ProductItem(productItem: state.products[index]),
                     );
                   },
                 ),
+                const SizedBox(height: 24),
               ],
             ),
           );

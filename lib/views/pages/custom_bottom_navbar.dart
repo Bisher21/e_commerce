@@ -76,34 +76,101 @@ class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.scaffoldBg,
       appBar: AppBar(
-        leading: const Padding(
-          padding: EdgeInsets.all(5.0),
-          child: CircleAvatar(
-            radius: 26,
-            backgroundImage: CachedNetworkImageProvider(
-              'https://randomuser.me/api/portraits/men/46.jpg',
+        backgroundColor: AppColors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: const CircleAvatar(
+              radius: 22,
+              backgroundImage: CachedNetworkImageProvider(
+                'https://randomuser.me/api/portraits/men/46.jpg',
+              ),
             ),
           ),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Jack Mith", style: Theme.of(context).textTheme.titleSmall),
             Text(
-              "Let's go shopping",
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall!.copyWith(color: AppColors.grey),
+              "Jack Mith",
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: Colors.black87,
+                letterSpacing: -0.2,
+              ),
+            ),
+            Text(
+              "Let's go shopping 🛍️",
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: AppColors.grey,
+                fontSize: 11,
+              ),
             ),
           ],
         ),
         actions: [
           if (currentIndex == 0) ...[
-            IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.notifications)),
+            IconButton(
+              onPressed: () {},
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.grey1,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.search_rounded,
+                  size: 20,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            IconButton(
+              onPressed: () {},
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.grey1,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.notifications_outlined,
+                  size: 20,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
           ] else if (currentIndex == 1)
-            IconButton(onPressed: () {}, icon: const Icon(Icons.shopping_bag)),
+            IconButton(
+              onPressed: () {},
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.grey1,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.shopping_bag_outlined,
+                  size: 20,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
         ],
       ),
       body: PersistentTabView(

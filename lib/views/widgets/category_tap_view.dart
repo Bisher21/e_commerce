@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../utils/app_colors.dart';
 import '../../view_models/category_cubit/category_cubit.dart';
 
-
 class CategoryTapView extends StatelessWidget {
   const CategoryTapView({super.key});
 
@@ -22,70 +21,111 @@ class CategoryTapView extends StatelessWidget {
           return const Center(child: CircularProgressIndicator.adaptive());
         } else if (state is CategoryLoaded) {
           return ListView.builder(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
             itemCount: state.categories.length,
             itemBuilder: (context, index) {
               final category = state.categories[index];
 
               return Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
+                padding: const EdgeInsets.only(bottom: 14.0),
                 child: InkWell(
                   onTap: () {
                     debugPrint("preeesssed");
                   },
+                  borderRadius: BorderRadius.circular(20),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(20),
                     child: SizedBox(
-                      height: 130,
+                      height: 140,
                       width: double.infinity,
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          //BOTTOM
+
                           CachedNetworkImage(
                             imageUrl: category.imgUrl,
                             fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              color: AppColors.grey2,
+                            ),
+                            errorWidget: (context, url, error) =>
+                                Container(color: AppColors.grey2),
                           ),
 
-                          // MIDDLE LAYER
+
                           Container(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                begin: Alignment.bottomCenter,
-                                end: Alignment.topCenter,
+                                begin: Alignment.bottomLeft,
+                                end: Alignment.topRight,
                                 colors: [
-                                  AppColors.black.withAlpha(95),
-                                  Colors.transparent,
+                                  Colors.black.withValues(alpha: 0.65),
+                                  Colors.black.withValues(alpha: 0.05),
                                 ],
                               ),
                             ),
                           ),
 
-                          //TOP LAYER
+
                           Positioned(
-                            bottom: 12,
-                            left: 12,
-                            right: 8,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
+                            bottom: 14,
+                            left: 16,
+                            right: 16,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text(
-                                  category.title,
-                                  style: Theme.of(context).textTheme.titleSmall
-                                      ?.copyWith(
-                                        color: AppColors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      category.title,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                            color: AppColors.white,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: -0.2,
+                                          ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '${category.productsCount} Items',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Colors.white70,
+                                          ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '${category.productsCount} Items',
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(color: Colors.white70),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.4,
+                                      ),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Explore",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),

@@ -39,28 +39,30 @@ Future<void> handleMyNotification() async {
     debugPrint('Message data: ${message.data}');
 
     if (message.notification != null) {
-      String title = message.notification!.title!;
-      String body = message.notification!.body!;
+      String title = message.notification!.title ?? 'Notification';
+      String body = message.notification!.body ?? '';
       debugPrint('Message also contained a notification: Title $title');
       debugPrint('Message also contained a notification: Body $body');
 
-      showDialog<void>(
-        context: navigatorKey.currentContext!,
-        builder: (BuildContext dialogContext) {
-          return AlertDialog(
-            title: Text(title),
-            content: Text(body),
-            actions: <Widget>[
-              TextButton(
-                child: const Text("Ok"),
-                onPressed: () {
-                  Navigator.of(dialogContext).pop(); // Dismiss alert dialog
-                },
-              ),
-            ],
-          );
-        },
-      );
+      if (navigatorKey.currentContext != null) {
+        showDialog<void>(
+          context: navigatorKey.currentContext!,
+          builder: (BuildContext dialogContext) {
+            return AlertDialog(
+              title: Text(title),
+              content: Text(body),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text("Ok"),
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
   });
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -87,30 +89,120 @@ class MyApp extends StatelessWidget {
         cubit.checkAuth();
         return cubit;
       },
-      child: Builder(
-        builder: (context) {
-          final cubit = BlocProvider.of<AuthCubit>(context);
-          return BlocBuilder<AuthCubit, AuthState>(
-            bloc: cubit,
-            buildWhen: (previous, current) =>
-                current is AuthInitial || current is AuthDone,
-
-            builder: (context, state) {
-              return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                title: 'E-commerce App',
-                navigatorKey: navigatorKey,
-                theme: ThemeData(
-                  colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-                  useMaterial3: true,
+      child: BlocBuilder<AuthCubit, AuthState>(
+        buildWhen: (previous, current) =>
+            current is AuthInitial || current is AuthDone,
+        builder: (context, state) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'E-commerce App',
+            navigatorKey: navigatorKey,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.deepPurple,
+                brightness: Brightness.light,
+              ),
+              useMaterial3: true,
+              scaffoldBackgroundColor: const Color(0xFFF8F7FC),
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.white,
+                elevation: 0,
+                scrolledUnderElevation: 0,
+                centerTitle: true,
+                titleTextStyle: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.2,
                 ),
+                iconTheme: IconThemeData(color: Colors.black87),
+              ),
 
-                initialRoute: state is AuthDone
-                    ? AppRoutes.homeRoute
-                    : AppRoutes.loginRoute,
-                onGenerateRoute: AppRouters.onGenerateRoute,
-              );
-            },
+              cardTheme: const CardThemeData(
+                elevation: 0,
+                color: Colors.white,
+                margin: EdgeInsets.zero,
+              ),
+              inputDecorationTheme: InputDecorationTheme(
+                filled: true,
+                fillColor: Colors.grey.shade100,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: Colors.deepPurple,
+                    width: 1.5,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFE53935),
+                    width: 1,
+                  ),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFE53935),
+                    width: 1,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+              ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ),
+              textTheme: const TextTheme(
+                displayLarge: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -1.0,
+                ),
+                headlineLarge: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
+                ),
+                headlineMedium: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
+                ),
+                headlineSmall: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ),
+                titleLarge: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.2,
+                ),
+                titleMedium: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.1,
+                ),
+                bodyMedium: TextStyle(letterSpacing: 0, height: 1.5),
+              ),
+            ),
+            initialRoute: state is AuthDone
+                ? AppRoutes.homeRoute
+                : AppRoutes.loginRoute,
+            onGenerateRoute: AppRouters.onGenerateRoute,
           );
         },
       ),

@@ -15,40 +15,71 @@ class PaymentMethodBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final paymentsCubit = BlocProvider.of<PaymentCardCubit>(context);
     return Container(
-      padding: const EdgeInsets.all(24.0),
-      height: MediaQuery.of(context).size.height * 0.6,
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+      height: MediaQuery.of(context).size.height * 0.62,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       child: Column(
         children: [
+          // ── Drag Handle ────────────────────────────────────────────
+          Center(
+            child: Container(
+              width: 36,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 "Payment Methods",
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black87,
+                ),
               ),
-              IconButton(
-                onPressed: () {
+              InkWell(
+                onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => BlocProvider.value(
-                        value: paymentsCubit,          // the same cubit the bottom sheet uses
+                        value: paymentsCubit,
                         child: const AddNewCardPage(),
                       ),
                     ),
                   );
                 },
-                icon: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
                   ),
-                  child: const Icon(
-                    Icons.add,
-                    color: AppColors.white,
-                    size: 20,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLight,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add_rounded, size: 16, color: AppColors.primary),
+                      SizedBox(width: 4),
+                      Text(
+                        "Add New",
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -74,7 +105,7 @@ class PaymentMethodBottomSheet extends StatelessWidget {
                   return ListView.separated(
                     itemCount: state.cards.length,
                     separatorBuilder: (context, index) =>
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final paymentCard = state.cards[index];
                       return BlocBuilder<PaymentCardCubit, PaymentCardState>(
@@ -84,61 +115,92 @@ class PaymentMethodBottomSheet extends StatelessWidget {
                         builder: (context, state) {
                           if (state is PaymentCardChosen) {
                             final chosenCard = state.chosenCard;
+                            final isSelected = chosenCard.id == paymentCard.id;
                             return InkWell(
                               onTap: () {
                                 paymentsCubit.changePaymentMethod(
                                   paymentCard.id,
                                 );
                               },
-                              child: DecoratedBox(
+                              borderRadius: BorderRadius.circular(16),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
                                 decoration: BoxDecoration(
-                                  color: AppColors.white,
+                                  color: isSelected
+                                      ? AppColors.primaryLight
+                                      : AppColors.white,
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
-                                    color: chosenCard.id == paymentCard.id
+                                    color: isSelected
                                         ? AppColors.primary
-                                        : AppColors.grey2,
-                                    width: chosenCard.id == paymentCard.id
-                                        ? 2
-                                        : 1,
+                                        : Colors.grey.shade200,
+                                    width: isSelected ? 1.5 : 1,
                                   ),
                                 ),
-
-                                child: ListTile(
-                                  leading: Container(
-                                    width: 50,
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.grey1,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: CachedNetworkImage(
-                                      imageUrl:
-                                          'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png',
-                                      fit: BoxFit.contain,
-                                      placeholder: (context, url) => const Center(
-                                        child:
-                                            CircularProgressIndicator.adaptive(),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 50,
+                                        height: 36,
+                                        padding: const EdgeInsets.all(5),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.grey1,
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: Colors.grey.shade200,
+                                          ),
+                                        ),
+                                        child: CachedNetworkImage(
+                                          imageUrl:
+                                              'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png',
+                                          fit: BoxFit.contain,
+                                          placeholder: (context, url) =>
+                                              const Center(
+                                                child:
+                                                    CircularProgressIndicator.adaptive(),
+                                              ),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.credit_card),
+                                        ),
                                       ),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.credit_card),
-                                    ),
-                                  ),
-                                  title: const Text(
-                                    'Mastercard',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    '**** **** **** ${paymentCard.cardNumber.substring(paymentCard.cardNumber.length - 4)}',
-                                    style: const TextStyle(
-                                      color: AppColors.grey,
-                                    ),
-                                  ),
-                                  trailing: const Icon(
-                                    Icons.chevron_right,
-                                    color: AppColors.grey,
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Mastercard',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                            Text(
+                                              '**** **** **** ${paymentCard.cardNumber.substring(paymentCard.cardNumber.length - 4)}',
+                                              style: const TextStyle(
+                                                color: AppColors.grey,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      if (isSelected)
+                                        Icon(
+                                          Icons.check_circle_rounded,
+                                          color: AppColors.primary,
+                                          size: 20,
+                                        )
+                                      else
+                                        Icon(
+                                          Icons.radio_button_unchecked_rounded,
+                                          color: Colors.grey.shade300,
+                                          size: 20,
+                                        ),
+                                    ],
                                   ),
                                 ),
                               ),

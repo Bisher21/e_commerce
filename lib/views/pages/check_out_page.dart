@@ -46,6 +46,9 @@ class CheckOutPage extends StatelessWidget {
         onTap: () {
           showModalBottomSheet(
             context: context,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
             builder: (_) {
               return BlocProvider(
                 create: (context) {
@@ -77,29 +80,60 @@ class CheckOutPage extends StatelessWidget {
         },
       );
     } else {
-      return Row(
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.all(Radius.circular(48)),
-            child: CachedNetworkImage(
-              imageUrl: address.image,
-              height: 100,
-              width: 100,
-              fit: BoxFit.cover,
+      return Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.primaryLight, width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
-          ),
-          const SizedBox(width: 16.0),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                address.city,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+          ],
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: CachedNetworkImage(
+                imageUrl: address.image,
+                height: 60,
+                width: 60,
+                fit: BoxFit.cover,
               ),
-              Text("${address.city}, ${address.country}"),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(width: 14.0),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    address.city,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "${address.city}, ${address.country}",
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.check_circle_rounded,
+              color: AppColors.primary,
+              size: 20,
+            ),
+          ],
+        ),
       );
     }
   }
@@ -108,7 +142,14 @@ class CheckOutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = BlocProvider.of<CheckoutCubit>(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Checkout'), centerTitle: true),
+      backgroundColor: AppColors.scaffoldBg,
+      appBar: AppBar(
+        title: const Text('Checkout'),
+        centerTitle: true,
+        backgroundColor: AppColors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
       body: BlocBuilder<CheckoutCubit, CheckoutState>(
         bloc: cubit,
         buildWhen: (previous, current) =>
@@ -123,68 +164,62 @@ class CheckOutPage extends StatelessWidget {
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CheckoutHeadlinesItems(
-                            title: "Address",
-                            onTap: () {
-                              Navigator.of(context)
-                                  .pushNamed(AppRoutes.addressRoute)
-                                  .then((value) => cubit.getCheckoutData());
-                            },
-                          ),
-                          _buildAddressMethodItem(
-                            cubit,
-                            state.chosenAddress,
-                            context,
-                          ),
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CheckoutHeadlinesItems(
+                          title: "Shipping Address",
+                          onTap: () {
+                            Navigator.of(context)
+                                .pushNamed(AppRoutes.addressRoute)
+                                .then((value) => cubit.getCheckoutData());
+                          },
+                        ),
+                        _buildAddressMethodItem(
+                          cubit,
+                          state.chosenAddress,
+                          context,
+                        ),
 
-                          const SizedBox(height: 16),
+                        const SizedBox(height: 8),
+                        CheckoutHeadlinesItems(
+                          title: "Products",
+                          productsAmount: state.numOfProducts,
+                        ),
 
-                          CheckoutHeadlinesItems(
-                            title: "Products",
-                            productsAmount: state.numOfProducts,
-                          ),
-
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: state.cartItems.length,
-                            itemBuilder: (context, index) {
-                              final cartItem = state.cartItems[index];
-                              final product = cartItem.product;
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0,
-                                ),
-                                child: Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withAlpha(50),
-                                        spreadRadius: 1,
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 1),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: state.cartItems.length,
+                          itemBuilder: (context, index) {
+                            final cartItem = state.cartItems[index];
+                            final product = cartItem.product;
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 10.0),
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(18),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.04,
                                       ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        height: 80,
-                                        width: 80,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.grey2,
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Container(
+                                        height: 72,
+                                        width: 72,
+                                        color: AppColors.grey2,
                                         child: CachedNetworkImage(
                                           imageUrl: product.imageUrl,
                                           fit: BoxFit.contain,
@@ -197,64 +232,65 @@ class CheckOutPage extends StatelessWidget {
                                               const Icon(Icons.error),
                                         ),
                                       ),
-                                      const SizedBox(width: 16),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              product.name,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium
-                                                  ?.copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              'Size: ${cartItem.size.name}  |  Qty: ${cartItem.quantity}',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall
-                                                  ?.copyWith(
-                                                    color: AppColors.grey,
-                                                  ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Text(
-                                              '\$${(product.price * cartItem.quantity).toStringAsFixed(2)}',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium
-                                                  ?.copyWith(
-                                                    color: AppColors.primary,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
+                                    ),
+                                    const SizedBox(width: 14),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            product.name,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.black87,
+                                                ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Size: ${cartItem.size.name}  ·  Qty: ${cartItem.quantity}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.copyWith(
+                                                  color: AppColors.grey,
+                                                ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            '\$${(product.price * cartItem.quantity).toStringAsFixed(2)}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleSmall
+                                                ?.copyWith(
+                                                  color: AppColors.primary,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            );
+                          },
+                        ),
 
-                          const SizedBox(height: 16),
-
-                          const CheckoutHeadlinesItems(title: "Payment"),
-                          _buildPaymentMethodItem(
-                            cubit,
-                            state.chosenCard,
-                            context,
-                          ),
-                        ],
-                      ),
+                        const SizedBox(height: 8),
+                        const CheckoutHeadlinesItems(title: "Payment Method"),
+                        _buildPaymentMethodItem(
+                          cubit,
+                          state.chosenCard,
+                          context,
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                     ),
                   ),
                 ),

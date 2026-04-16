@@ -20,70 +20,82 @@ class CartSummaryWidget extends StatelessWidget {
     const double shippingPrice = 10.0;
     final double total = subtotal + shippingPrice;
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(32),
-          topRight: Radius.circular(32),
+          topLeft: Radius.circular(28),
+          topRight: Radius.circular(28),
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withAlpha(14),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
+            color: Colors.black.withValues(alpha: 0.07),
+            blurRadius: 20,
+            offset: const Offset(0, -6),
           ),
         ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+
+          Center(
+            child: Container(
+              width: 36,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+
           if (!isCheckout) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Subtotal", style: TextStyle(color: AppColors.grey)),
-                Text(
-                  "\$${subtotal.toStringAsFixed(2)}",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Shipping", style: TextStyle(color: AppColors.grey)),
-                Text(
-                  "\$${shippingPrice.toStringAsFixed(2)}",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: Divider(),
+            _SummaryRow(label: "Subtotal", value: subtotal),
+            const SizedBox(height: 10),
+            _SummaryRow(label: "Shipping", value: shippingPrice),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14.0),
+              child: Divider(color: Colors.grey.shade200, thickness: 1),
             ),
           ],
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 isCheckout ? "Total Amount" : "Total",
-                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black87,
+                ),
               ),
-              Text(
-                "\$${total.toStringAsFixed(2)}",
-                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '\$',
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
+                    TextSpan(
+                      text: total.toStringAsFixed(2),
+                      style:
+                          Theme.of(context).textTheme.headlineSmall!.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: Colors.black87,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           CustomElevatedButton(
             text: buttonText,
             onPressed: () {
@@ -97,6 +109,34 @@ class CartSummaryWidget extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SummaryRow extends StatelessWidget {
+  final String label;
+  final double value;
+  const _SummaryRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Colors.black54,
+          ),
+        ),
+        Text(
+          '\$${value.toStringAsFixed(2)}',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -28,36 +28,70 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Column(
-          children: [
-            TabBar(
-              controller: _tabController,
-              unselectedLabelColor: AppColors.grey,
-              tabs: const [Text("Home"), Text("Category")],
-            ),
+      child: Column(
+        children: [
 
-            const SizedBox(height: 24),
-            Expanded(
-              child: TabBarView(
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: Container(
+              height: 46,
+              decoration: BoxDecoration(
+                color: AppColors.grey2,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: TabBar(
                 controller: _tabController,
-                children: [
-                  const HomeTapView(),
-                  BlocProvider(
-                    create: (context) {
-                      final cubit = CategoryCubit();
-                      cubit.fetchCategories();
-
-                      return cubit;
-                    },
-                    child: const CategoryTapView(),
-                  ),
+                indicator: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                labelColor: AppColors.white,
+                unselectedLabelColor: AppColors.grey,
+                labelStyle: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  letterSpacing: 0.1,
+                ),
+                unselectedLabelStyle: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+                tabs: const [
+                  Tab(text: "Home"),
+                  Tab(text: "Category"),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+
+          const SizedBox(height: 16),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                const HomeTapView(),
+                BlocProvider(
+                  create: (context) {
+                    final cubit = CategoryCubit();
+                    cubit.fetchCategories();
+
+                    return cubit;
+                  },
+                  child: const CategoryTapView(),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -41,14 +41,164 @@ class _AddNewCardPageState extends State<AddNewCardPage> {
   Widget build(BuildContext context) {
     final cubit = BlocProvider.of<PaymentCardCubit>(context);
     return Scaffold(
-      appBar: AppBar(title: const Text("Add New Card"), centerTitle: true),
+      backgroundColor: AppColors.scaffoldBg,
+      appBar: AppBar(
+        title: const Text("Add New Card"),
+        centerTitle: true,
+        backgroundColor: AppColors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Form(
           key: _formKey,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+
+              AnimatedBuilder(
+                animation: Listenable.merge([
+                  _cardNumberController,
+                  _cardHolderNameController,
+                  _expiryDateController,
+                ]),
+                builder: (context, _) {
+                  final number = _cardNumberController.text.isEmpty
+                      ? '•••• •••• •••• ••••'
+                      : _formatCardNumber(_cardNumberController.text);
+                  final holder = _cardHolderNameController.text.isEmpty
+                      ? 'CARDHOLDER NAME'
+                      : _cardHolderNameController.text.toUpperCase();
+                  final expiry = _expiryDateController.text.isEmpty
+                      ? 'MM/YY'
+                      : _expiryDateController.text;
+
+                  return Container(
+                    width: double.infinity,
+                    height: 190,
+                    margin: const EdgeInsets.only(bottom: 28),
+                    padding: const EdgeInsets.all(22),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFF7E57C2), Color(0xFF311B92)],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.4),
+                          blurRadius: 24,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Icon(
+                              Icons.contactless_outlined,
+                              color: Colors.white70,
+                              size: 28,
+                            ),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 30,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.withValues(alpha: 0.7),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                Transform.translate(
+                                  offset: const Offset(-12, 0),
+                                  child: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange.withValues(
+                                        alpha: 0.7,
+                                      ),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        Text(
+                          number,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "CARD HOLDER",
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.6),
+                                    fontSize: 9,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                                Text(
+                                  holder,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "EXPIRES",
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.6),
+                                    fontSize: 9,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                                Text(
+                                  expiry,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
+
               CustomTextField(
                 controller: _cardNumberController,
                 label: "Card Number",
@@ -65,7 +215,7 @@ class _AddNewCardPageState extends State<AddNewCardPage> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
               CustomTextField(
                 controller: _cardHolderNameController,
                 label: "Cardholder Name",
@@ -81,7 +231,7 @@ class _AddNewCardPageState extends State<AddNewCardPage> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -101,29 +251,26 @@ class _AddNewCardPageState extends State<AddNewCardPage> {
                         ).hasMatch(value)) {
                           return 'Invalid format';
                         }
-
-                        // Extract month and year
                         int month = int.parse(value.substring(0, 2));
                         int year =
                             int.parse(value.substring(value.length - 2)) + 2000;
-
                         DateTime now = DateTime.now();
                         if (year < now.year ||
                             (year == now.year && month < now.month)) {
                           return 'Card has expired';
                         }
-
                         return null;
                       },
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: CustomTextField(
                       controller: _cvvController,
                       label: "CVV",
-                      hintText: "123",
+                      hintText: "•••",
                       prefixIcon: Icons.lock_outline,
+                      obscureText: true,
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -138,10 +285,10 @@ class _AddNewCardPageState extends State<AddNewCardPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 36),
               SizedBox(
                 width: double.infinity,
-                height: 60,
+                height: 58,
                 child: BlocConsumer<PaymentCardCubit, PaymentCardState>(
                   buildWhen: (previous, current) =>
                       current is AddPaymentCardLoading ||
@@ -149,45 +296,69 @@ class _AddNewCardPageState extends State<AddNewCardPage> {
                       current is AddPaymentCardFailed,
                   bloc: cubit,
                   builder: (context, state) {
-                    if (state is AddPaymentCardLoading) {
-                      return ElevatedButton(
+                    final isLoading = state is AddPaymentCardLoading;
+                    return DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(32),
+                        gradient: !isLoading
+                            ? const LinearGradient(
+                                colors: [Color(0xFF7E57C2), Color(0xFF512DA8)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              )
+                            : null,
+                        color: isLoading ? Colors.grey.shade300 : null,
+                        boxShadow: !isLoading
+                            ? [
+                                BoxShadow(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.35,
+                                  ),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: AppColors.white,
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32),
                           ),
                           elevation: 0,
                         ),
-                        onPressed: null,
-                        child: const CircularProgressIndicator.adaptive(),
-                      );
-                    }
-                    return ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(32),
-                        ),
-                        elevation: 0,
-                      ),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          cubit.addPaymentCard(
-                            _cardNumberController.text,
-                            _cardHolderNameController.text,
-                            _cvvController.text,
-                            _expiryDateController.text,
-                          );
-                        }
-                      },
-                      child: const Text(
-                        "Add Card",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                                if (_formKey.currentState!.validate()) {
+                                  cubit.addPaymentCard(
+                                    _cardNumberController.text,
+                                    _cardHolderNameController.text,
+                                    _cvvController.text,
+                                    _expiryDateController.text,
+                                  );
+                                }
+                              },
+                        child: isLoading
+                            ? const SizedBox(
+                                height: 22,
+                                width: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                "Add Card",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
                       ),
                     );
                   },
@@ -196,7 +367,9 @@ class _AddNewCardPageState extends State<AddNewCardPage> {
                       current is AddPaymentCardFailed,
                   listener: (context, state) {
                     if (state is AddPaymentCardSuccess) {
-                      BlocProvider.of<PaymentCardCubit>(context).fetchPaymentCards();
+                      BlocProvider.of<PaymentCardCubit>(
+                        context,
+                      ).fetchPaymentCards();
                       Navigator.pop(context);
                     } else if (state is AddPaymentCardFailed) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -210,7 +383,9 @@ class _AddNewCardPageState extends State<AddNewCardPage> {
                               const SizedBox(width: 12),
                               Text(
                                 state.message,
-                                style: Theme.of(context).textTheme.bodyMedium
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
                                     ?.copyWith(
                                       color: AppColors.white,
                                       fontWeight: FontWeight.bold,
@@ -231,10 +406,21 @@ class _AddNewCardPageState extends State<AddNewCardPage> {
                   },
                 ),
               ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
       ),
     );
+  }
+
+  String _formatCardNumber(String number) {
+    final clean = number.replaceAll(RegExp(r'\D'), '');
+    final buffer = StringBuffer();
+    for (int i = 0; i < clean.length && i < 16; i++) {
+      if (i > 0 && i % 4 == 0) buffer.write(' ');
+      buffer.write(clean[i]);
+    }
+    return buffer.toString().padRight(19, '•').replaceAll('', '');
   }
 }

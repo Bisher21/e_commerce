@@ -17,55 +17,64 @@ class CartItemWidget extends StatelessWidget {
     final cubit = BlocProvider.of<CartCubit>(context);
     final product = cartItem.product;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withAlpha(70),
-              spreadRadius: 1,
-              blurRadius: 10,
-              offset: const Offset(0, 1),
+              color: Colors.black.withValues(alpha: 0.05),
+              spreadRadius: 0,
+              blurRadius: 14,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Row(
           children: [
-            // Product Image
-            Container(
-              height: 90,
-              width: 90,
-              decoration: BoxDecoration(
+
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                height: 88,
+                width: 88,
                 color: AppColors.grey2,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: CachedNetworkImage(
-                imageUrl: product.imageUrl,
-                fit: BoxFit.contain,
-                placeholder: (context, url) =>
-                    const Center(child: CircularProgressIndicator.adaptive()),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
+                child: CachedNetworkImage(
+                  imageUrl: product.imageUrl,
+                  fit: BoxFit.contain,
+                  placeholder: (context, url) =>
+                      const Center(child: CircularProgressIndicator.adaptive()),
+                  errorWidget: (context, url, error) =>
+                      const Icon(Icons.error),
+                ),
               ),
             ),
-            const SizedBox(width: 16),
-            // Product Details
+            const SizedBox(width: 14),
+
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        product.name,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      Expanded(
+                        child: Text(
+                          product.name,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black87,
+                                letterSpacing: -0.1,
+                              ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
+                      const SizedBox(width: 4),
                       BlocBuilder<CartCubit, CartState>(
                         buildWhen: (previous, current) =>
                             (current is RemovingCartItem &&
@@ -79,35 +88,52 @@ class CartItemWidget extends StatelessWidget {
                           if (state is RemovingCartItem &&
                               state.cartItemId == cartItem.id) {
                             return const SizedBox(
-                              height: 20,
-                              width: 20,
+                              height: 18,
+                              width: 18,
                               child: CircularProgressIndicator.adaptive(
                                 strokeWidth: 2,
                               ),
                             );
                           }
-                          return IconButton(
-                            constraints: const BoxConstraints(),
-                            padding: EdgeInsets.zero,
-                            icon: const Icon(
-                              Icons.delete_outline,
-                              color: Colors.red,
-                              size: 20,
+                          return InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () => cubit.removeCartItem(cartItem.id),
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.delete_outline_rounded,
+                                color: Colors.red,
+                                size: 16,
+                              ),
                             ),
-                            onPressed: () => cubit.removeCartItem(cartItem.id),
                           );
                         },
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    'Size: ${cartItem.size.name}',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(color: AppColors.grey),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLight,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'Size: ${cartItem.size.name}',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   BlocBuilder<CartCubit, CartState>(
                     bloc: cubit,
                     buildWhen: (previous, current) =>
@@ -127,7 +153,7 @@ class CartItemWidget extends StatelessWidget {
                               style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
                                     color: AppColors.primary,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w800,
                                   ),
                             ),
                             CounterWidgetCartPage(
@@ -146,7 +172,7 @@ class CartItemWidget extends StatelessWidget {
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   color: AppColors.primary,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w800,
                                 ),
                           ),
                           CounterWidgetCartPage(
